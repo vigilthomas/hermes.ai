@@ -1,0 +1,6 @@
+{
+  "name": "Hermes AI",
+  "description": "An AI-powered job search aggregator and career assistant that fetches jobs from LinkedIn, Glassdoor, Indeed, and more. Features resume parsing, smart filtering, and AI-driven job match analysis with tailored actions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
