@@ -19,12 +19,14 @@ export const jobService = {
     if (TAVILY_API_KEY) {
       const resp = await axios.post('https://api.tavily.com/search', {
         api_key: TAVILY_API_KEY,
-        query: `recent job openings for ${query} in ${location} on career pages`,
-        search_depth: "advanced"
+        query: searchQuery,
+        search_depth: "advanced",
+        max_results: 8,
+        include_domains: [
+          "linkedin.com", "indeed.com", "glassdoor.com",
+          "greenhouse.io", "lever.co", "workday.com", "jobs.ashbyhq.com"
+        ]
       });
-      // process resp.data.results
-    }
-    */
 
     return [
       {

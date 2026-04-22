@@ -20,7 +20,7 @@ export const aiService = {
         "matchedSkills": string[],
         "missingSkills": string[]
       }
-      
+
       Job Description: ${jobDescription}
       Resume: ${resumeText}
     `;
