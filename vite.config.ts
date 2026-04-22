@@ -35,6 +35,9 @@ export default defineConfig(({ mode }) => {
     ],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      'process.env.GROQ_API_KEY': JSON.stringify(env.GROQ_API_KEY),
+      'process.env.TAVILY_API_KEY': JSON.stringify(env.TAVILY_API_KEY),
+      'process.env.FIRECRAWLER_API_KEY': JSON.stringify(env.FIRECRAWLER_API_KEY),
     },
     resolve: {
       alias: {

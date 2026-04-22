@@ -35,20 +35,16 @@ export default function ResumeUpload({ onParsed }: ResumeUploadProps) {
 
   const handleParse = async (file: File) => {
     setIsParsing(true);
-    // In a real app we'd send the file to a backend or use an OCR library
-    // For this build, we simulate AI parsing the "extracted text"
-    
-    setTimeout(async () => {
-      const mockSkills = ['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Figma', 'GraphQL'];
-      const data = { 
-        skills: mockSkills, 
-        title: 'Senior Frontend Developer',
-        summary: 'Expert in building scalable web applications with modern tech stacks.'
-      };
+    try {
+      const data = await aiService.parseResume(file);
       setParsedData(data);
       onParsed(data);
+    } catch (error) {
+      console.error('Resume parsing failed:', error);
+      onParsed({ skills: [] });
+    } finally {
       setIsParsing(false);
-    }, 2000);
+    }
   };
 
   const removeFile = () => {
