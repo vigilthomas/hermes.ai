@@ -36,9 +36,10 @@ interface JobCardProps {
   job: Job;
   isBookmarked?: boolean;
   onBookmark?: (id: string) => void;
+  userResume?: string;
 }
 
-export default function JobCard({ job, isBookmarked, onBookmark }: JobCardProps) {
+export default function JobCard({ job, isBookmarked, onBookmark, userResume }: JobCardProps) {
   const [activeTab, setActiveTab] = useState('overview');
   const [matchAnalysis, setMatchAnalysis] = useState<MatchAnalysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -70,11 +71,13 @@ export default function JobCard({ job, isBookmarked, onBookmark }: JobCardProps)
   };
 
   const getMatchAnalysis = async () => {
+    const resumeText = userResume || '';
+    if (!resumeText) {
+      return;
+    }
     setIsAnalyzing(true);
     try {
-      // Mocking resume text for now
-      const mockResume = "Experienced software engineer with skills in React, TypeScript, and Tailwind CSS.";
-      const analysis = await aiService.analyzeJobMatch(job.description, mockResume);
+      const analysis = await aiService.analyzeJobMatch(job.description, resumeText);
       setMatchAnalysis(analysis);
     } catch (err) {
       console.error(err);
@@ -131,7 +134,7 @@ export default function JobCard({ job, isBookmarked, onBookmark }: JobCardProps)
               <TabsTrigger value="overview" className="text-xs font-semibold h-12 rounded-none data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:border-b-2 data-[state=active]:border-[#6366F1] border-b-2 border-transparent text-slate-500">Overview</TabsTrigger>
               <TabsTrigger value="company" className="text-xs font-semibold h-12 rounded-none data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:border-b-2 data-[state=active]:border-[#6366F1] border-b-2 border-transparent text-slate-500">🏛️ Co.</TabsTrigger>
               <TabsTrigger value="pay" className="text-xs font-semibold h-12 rounded-none data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:border-b-2 data-[state=active]:border-[#6366F1] border-b-2 border-transparent text-slate-500">💰 Pay</TabsTrigger>
-              <TabsTrigger value="match" className="text-xs font-semibold h-12 rounded-none data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:border-b-2 data-[state=active]:border-[#6366F1] border-b-2 border-transparent text-slate-500" onClick={() => !matchAnalysis && getMatchAnalysis()}>🎯 Match</TabsTrigger>
+              <TabsTrigger value="match" className="text-xs font-semibold h-12 rounded-none data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:border-b-2 data-[state=active]:border-[#6366F1] border-b-2 border-transparent text-slate-500" onClick={() => !matchAnalysis && userResume && getMatchAnalysis()}>🎯 Match</TabsTrigger>
               <TabsTrigger value="actions" className="text-xs font-semibold h-12 rounded-none data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:border-b-2 data-[state=active]:border-[#6366F1] border-b-2 border-transparent text-slate-500">⚡ Act</TabsTrigger>
             </TabsList>
 
@@ -238,7 +241,12 @@ export default function JobCard({ job, isBookmarked, onBookmark }: JobCardProps)
                 </TabsContent>
 
                 <TabsContent value="match" className="m-0 mt-0">
-                  {isAnalyzing ? (
+                  {!userResume ? (
+                    <div className="flex flex-col items-center justify-center py-8 text-center space-y-3">
+                      <Target className="w-10 h-10 text-muted-foreground opacity-20" />
+                      <p className="text-xs text-muted-foreground">Upload your resume to see your match score</p>
+                    </div>
+                  ) : isAnalyzing ? (
                     <div className="space-y-4 py-8 text-center">
                       <div className="w-12 h-12 border-4 border-[#6366F1] border-t-transparent rounded-full animate-spin mx-auto" />
                       <p className="text-xs font-semibold text-[#64748B] animate-pulse">Running AI Gap Analysis...</p>
@@ -344,11 +352,14 @@ export default function JobCard({ job, isBookmarked, onBookmark }: JobCardProps)
             >
               <Bookmark className={cn("w-4 h-4", isBookmarked && "fill-current")} />
             </Button>
-            <Button className="h-11 px-8 rounded-lg font-bold bg-[#6366F1] hover:bg-[#6366F1]/90 shadow-none border-none text-sm" asChild>
-              <a href={job.applyUrl} target="_blank" rel="noopener noreferrer">
-                Apply Now <ChevronRight className="w-4 h-4 ml-2" />
-              </a>
-            </Button>
+            <a
+              href={job.applyUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center h-11 px-8 rounded-lg font-bold bg-[#6366F1] hover:bg-[#6366F1]/90 text-white text-sm transition-colors"
+            >
+              Apply Now <ChevronRight className="w-4 h-4 ml-2" />
+            </a>
           </div>
         </CardFooter>
       </Card>

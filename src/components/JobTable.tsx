@@ -39,7 +39,11 @@ export default function JobTable({ jobs, onBookmark, bookmarkedIds = [] }: JobTa
             <TableRow key={job.id} className="group hover:bg-[#F8FAFC] border-b-[#F1F5F9] transition-colors">
               <TableCell className="py-4">
                 <div className="flex items-center gap-3">
-                  <img src={job.company.logo} alt="" className="w-9 h-9 rounded-lg bg-gray-100 border border-[#F1F5F9]" />
+                  <img
+                    src={job.company.logo ?? `https://ui-avatars.com/api/?name=${encodeURIComponent(job.company.name)}&size=40&background=6366f1&color=fff`}
+                    alt={job.company.name}
+                    className="w-9 h-9 rounded-lg bg-gray-100 border border-[#F1F5F9]"
+                  />
                   <div>
                     <p className="font-bold text-[14px] leading-tight text-[#1E293B] group-hover:text-[#6366F1] transition-colors">{job.title}</p>
                     <div className="flex items-center gap-1.5 mt-0.5">
@@ -60,7 +64,9 @@ export default function JobTable({ jobs, onBookmark, bookmarkedIds = [] }: JobTa
               </TableCell>
               <TableCell>
                 <span className="text-xs font-semibold text-gray-700">
-                  {job.salary?.currency}{job.salary?.min.toLocaleString()} - {job.salary?.max.toLocaleString()}
+                  {job.salary
+                    ? `${job.salary.currency}${job.salary.min.toLocaleString()} – ${job.salary.max.toLocaleString()}`
+                    : 'Not disclosed'}
                 </span>
               </TableCell>
               <TableCell>
@@ -81,11 +87,14 @@ export default function JobTable({ jobs, onBookmark, bookmarkedIds = [] }: JobTa
                   <Button variant="ghost" size="icon" className="h-9 w-9 hover:bg-gray-100 rounded-lg transition-all" onClick={() => onBookmark?.(job.id)}>
                     <Bookmark className={cn("w-4 h-4", bookmarkedIds.includes(job.id) && "fill-[#6366F1] text-[#6366F1]")} />
                   </Button>
-                  <Button variant="default" size="sm" className="h-9 px-5 bg-[#6366F1] hover:bg-[#6366F1]/90 rounded-lg text-xs font-bold transition-all border-none" asChild>
-                    <a href={job.applyUrl} target="_blank" rel="noopener noreferrer">
-                      Apply <ExternalLink className="w-3 h-3 ml-1.5" />
-                    </a>
-                  </Button>
+                  <a
+                    href={job.applyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center h-9 px-5 bg-[#6366F1] hover:bg-[#6366F1]/90 text-white rounded-lg text-xs font-bold transition-colors"
+                  >
+                    Apply <ExternalLink className="w-3 h-3 ml-1.5" />
+                  </a>
                 </div>
               </TableCell>
             </TableRow>

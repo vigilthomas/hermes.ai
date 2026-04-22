@@ -42,11 +42,18 @@ export default function App() {
   const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   const [bookmarkedIds, setBookmarkedIds] = useState<string[]>([]);
   const [userSkills, setUserSkills] = useState<string[]>([]);
+  const [userResumeText, setUserResumeText] = useState('');
 
   const locations = ['Remote', 'San Francisco, CA', 'London, UK', 'New York, NY', 'Bangalore, IND', 'Berlin, GER'];
   const roles = ['Frontend', 'Backend', 'Fullstack', 'Design', 'Product', 'DevOps'];
 
   useEffect(() => {
+    const hasTavilyKey = !!process.env.TAVILY_API_KEY;
+    if (!hasTavilyKey) {
+      toast.warning('Job search is disabled. Add TAVILY_API_KEY to your .env file to enable it.', {
+        duration: 8000,
+      });
+    }
     fetchJobs();
   }, []);
 
@@ -69,8 +76,9 @@ export default function App() {
     toast.success(bookmarkedIds.includes(id) ? 'Removed from bookmarks' : 'Added to bookmarks');
   };
 
-  const handleResumeParsed = (data: { skills: string[] }) => {
+  const handleResumeParsed = (data: { skills: string[]; title?: string; summary?: string }) => {
     setUserSkills(data.skills);
+    setUserResumeText(data.summary || data.skills.join(', ') || '');
     // Auto-select filters based on skills (example logic)
     if (data.skills.some(s => s.toLowerCase().includes('frontend'))) {
       setSelectedRoles(prev => Array.from(new Set([...prev, 'Frontend'])));
@@ -208,7 +216,7 @@ export default function App() {
                 </div>
               </div>
               
-              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as any)} className="bg-[#F1F5F9] p-1 rounded-lg">
+              <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'grid' | 'table')} className="bg-[#F1F5F9] p-1 rounded-lg">
                 <TabsList className="bg-transparent h-8">
                   <TabsTrigger value="grid" className="h-7 px-3 data-[state=active]:bg-white data-[state=active]:text-[#6366F1] data-[state=active]:shadow-sm rounded-md transition-all">
                     <LayoutGrid className="w-4 h-4" />
@@ -242,11 +250,12 @@ export default function App() {
                       className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6"
                     >
                       {filteredJobs.map(job => (
-                        <JobCard 
-                          key={job.id} 
-                          job={job} 
+                        <JobCard
+                          key={job.id}
+                          job={job}
                           isBookmarked={bookmarkedIds.includes(job.id)}
                           onBookmark={handleBookmark}
+                          userResume={userResumeText}
                         />
                       ))}
                     </motion.div>

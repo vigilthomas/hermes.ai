@@ -1,13 +1,13 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+const supabaseUrl = import.meta.env.SUPABASE_URL || "";
+const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY || "";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 /**
  * SQL Setup for Supabase:
- * 
+ *
  * -- Create bookmarks table
  * create table bookmarks (
  *   id uuid default uuid_generate_v4() primary key,
@@ -16,7 +16,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
  *   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
  *   unique(user_id, job_id)
  * );
- * 
+ *
  * -- Create applications table
  * create table applications (
  *   id uuid default uuid_generate_v4() primary key,
@@ -26,16 +26,16 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
  *   applied_at timestamp with time zone default timezone('utc'::text, now()) not null,
  *   unique(user_id, job_id)
  * );
- * 
+ *
  * -- Enable Row Level Security (RLS)
  * alter table bookmarks enable row level security;
  * alter table applications enable row level security;
- * 
+ *
  * -- Create policies
  * create policy "Users can manage their own bookmarks"
  *   on bookmarks for all
  *   using (auth.uid() = user_id);
- * 
+ *
  * create policy "Users can manage their own applications"
  *   on applications for all
  *   using (auth.uid() = user_id);

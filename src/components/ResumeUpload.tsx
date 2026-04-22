@@ -15,6 +15,7 @@ export default function ResumeUpload({ onParsed }: ResumeUploadProps) {
   const [file, setFile] = useState<File | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [parsedData, setParsedData] = useState<{ skills: string[]; title?: string } | null>(null);
+  const [parseError, setParseError] = useState<string | null>(null);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles.length > 0) {
@@ -35,25 +36,27 @@ export default function ResumeUpload({ onParsed }: ResumeUploadProps) {
 
   const handleParse = async (file: File) => {
     setIsParsing(true);
-    // In a real app we'd send the file to a backend or use an OCR library
-    // For this build, we simulate AI parsing the "extracted text"
-    
-    setTimeout(async () => {
-      const mockSkills = ['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Figma', 'GraphQL'];
-      const data = { 
-        skills: mockSkills, 
-        title: 'Senior Frontend Developer',
-        summary: 'Expert in building scalable web applications with modern tech stacks.'
-      };
+    setParseError(null);
+    try {
+      const data = await aiService.parseResume(file);
       setParsedData(data);
       onParsed(data);
+    } catch (error) {
+      const msg =
+        error instanceof Error
+          ? error.message
+          : 'Resume parsing failed. Check your API keys.';
+      setParseError(msg);
+      onParsed({ skills: [] });
+    } finally {
       setIsParsing(false);
-    }, 2000);
+    }
   };
 
   const removeFile = () => {
     setFile(null);
     setParsedData(null);
+    setParseError(null);
   };
 
   return (
@@ -103,6 +106,10 @@ export default function ResumeUpload({ onParsed }: ResumeUploadProps) {
                 <X className="w-4 h-4" />
               </Button>
             </div>
+
+            {parseError && (
+              <p className="text-xs text-red-600 font-medium leading-snug">{parseError}</p>
+            )}
 
             {isParsing ? (
               <div className="flex flex-col items-center justify-center py-4 space-y-3">
